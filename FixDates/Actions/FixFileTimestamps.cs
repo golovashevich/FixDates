@@ -1,6 +1,7 @@
 using System;
 using System.Collections.Generic;
 using System.IO;
+using FixDates.Helpers;
 
 namespace FixDates.Actions
 {
@@ -20,19 +21,21 @@ namespace FixDates.Actions
                 return;
             }
 
-            var parser = new TimeStampParser();
-            var files = Directory.GetFiles(sourcePath);
+			var stamps = new List<Tuple<string, DateTime>>();
+			var parser = new TimeStampParser();
+            parser.UnrecognizedStamp += file => 
+                throw new InvalidOperationException($"Unrecognized name: {file}");
+            parser.RecognizedStamp += (filePath, fileStamp) =>  {
+                var fileName = Path.GetFileName(filePath);
+				Console.WriteLine("{0} - {1}", fileName, TimeStampParser.FileStampFromDate(fileStamp));
+				stamps.Add(Tuple.Create(filePath, fileStamp));
+			};
+            parser.IgnoredName += file => Console.WriteLine($"Ignoring {file}");
 
-            var stamps = new List<Tuple<string, DateTime>>();
+            var files = Directory.GetFiles(sourcePath);
             foreach (var filePath in files)
             {
-                var fileName = Path.GetFileName(filePath);
-                if (!parser.RecognizeStampFormat(fileName, out DateTime fileStamp))
-                {
-                    throw new InvalidOperationException($"Unrecognized {fileName}");
-                }
-                Console.WriteLine("{0} - {1}", fileName, TimeStampParser.FileStampFromDate(fileStamp));
-                stamps.Add(Tuple.Create(filePath, fileStamp));
+				parser.RecognizeStampFormat(filePath);
             }
 
             Console.WriteLine("All stamps are recognized");

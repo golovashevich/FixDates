@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using System.IO;
 using System.Text.RegularExpressions;
 
-namespace FixDates
+namespace FixDates.Helpers
 {
     public class TimeStampParser
     {
@@ -14,6 +14,13 @@ namespace FixDates
             @"[0-9a-fA-F]{{8}}-[0-9a-fA-F]{{4}}-[0-9a-fA-F]{{4}}-[0-9a-fA-F]{{4}}-[0-9a-fA-F]{{12}}";
 
         public const string TIMESTAMP_FORMAT = "{0}{1:d2}{2:d2}_{3:d2}{4:d2}{5:d2}"; 
+
+        public event Action<string, DateTime> RecognizedStamp;
+
+        public event Action<string> UnrecognizedStamp;
+
+        public event Action<string> IgnoredName; 
+
         private static string[] MASKS = {
             "VID_{0}.mp4", 
             "{0}.mp4", 
@@ -31,7 +38,18 @@ namespace FixDates
             @"Screenshot_{0}-\d{{3}}_.*.png",
         };
 
+        private static string[] IGNORED_MASKS = {
+            @"IMG_\d\d\d\d\.JPG",
+			@"MVI_\d\d\d\d\.AVI",
+			@"MVI_\d\d\d\d\.THM",
+            @"Thumbs\.db",
+			@"\.DS_Store",
+			@"^\d\.JPG", 
+            @"^\d\d\.JPG"
+        };
+
         private readonly List<Tuple<string, Regex>> _sequences;
+        private readonly List<Tuple<string, Regex>> _ignoredSequences; 
 
         public TimeStampParser() {
             _sequences = new List<Tuple<string, Regex>>();
@@ -39,25 +57,44 @@ namespace FixDates
                 var tempResult = String.Format(mask, TIMESTAMP_MASK);
                 _sequences.Add(Tuple.Create(
                         mask, 
-                        new Regex(String.Format(mask, TIMESTAMP_MASK), RegexOptions.CultureInvariant)));
+                        new Regex(String.Format(mask, TIMESTAMP_MASK), 
+                            RegexOptions.CultureInvariant | RegexOptions.IgnoreCase)));
             }
-        }
 
-        public bool RecognizeStampFormat(string fileName, out DateTime fileDate) {
-            fileDate = DateTime.MinValue;
+			_ignoredSequences = new List<Tuple<string, Regex>>();
+			foreach (var mask in IGNORED_MASKS)
+			{
+				_ignoredSequences.Add(Tuple.Create(
+						mask,
+						new Regex(mask, RegexOptions.CultureInvariant | RegexOptions.IgnoreCase)));
+			}
+		}
+
+        public void RecognizeStampFormat(string filePath) {
+			var fileName = Path.GetFileName(filePath);
+
+			var fileDate = DateTime.MinValue;
+            foreach (var sequence in _ignoredSequences) {
+                var match = sequence.Item2.Match(fileName);
+                if (match.Success) {
+                    IgnoredName?.Invoke(fileName);
+                    return;
+                }
+            }
             foreach (var sequence in _sequences) {
                 var match = sequence.Item2.Match(fileName);
                 if (match.Success)
                 {
-                    fileDate = ComposeDate(match);
+                    fileDate = ComposeDateTime(match);
+                    RecognizedStamp?.Invoke(filePath, fileDate);
                     // CheckDateAgainstName(fileName, sequence.Item1, fileTime);
-                    return true;
+                    return;
                 }
             }
-            return false;
+            UnrecognizedStamp.Invoke(fileName);
         }
 
-        private static DateTime ComposeDate(Match match)
+        private static DateTime ComposeDateTime(Match match)
         {
             var year = Convert.ToInt32(match.Groups["y"].Value);
             var month = Convert.ToInt32(match.Groups["month"].Value);
