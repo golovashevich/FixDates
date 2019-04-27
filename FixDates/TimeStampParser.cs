@@ -16,6 +16,7 @@ namespace FixDates
         public const string TIMESTAMP_FORMAT = "{0}{1:d2}{2:d2}_{3:d2}{4:d2}{5:d2}"; 
         private static string[] MASKS = {
             "VID_{0}.mp4", 
+            "{0}.mp4", 
             "IMG_{0}.jpg",
             @"IMG_\d\d\d\d_{0}\d{{3}}.MOV",
             "PANO_{0}.jpg",
@@ -36,7 +37,9 @@ namespace FixDates
             _sequences = new List<Tuple<string, Regex>>();
             foreach(var mask in MASKS) {
                 var tempResult = String.Format(mask, TIMESTAMP_MASK);
-                _sequences.Add(Tuple.Create(mask, new Regex(String.Format(mask, TIMESTAMP_MASK))));
+                _sequences.Add(Tuple.Create(
+                        mask, 
+                        new Regex(String.Format(mask, TIMESTAMP_MASK), RegexOptions.CultureInvariant)));
             }
         }
 
