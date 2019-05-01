@@ -16,6 +16,7 @@ namespace FixDates.Actions
 
         public static void Process(string sourceKey)
         {
+            Console.WriteLine("Detecting files that are in wrong photo dirs");
             var sourcePath = Environment.GetEnvironmentVariable(sourceKey);
             if (String.IsNullOrWhiteSpace(sourcePath))
             {
@@ -30,7 +31,7 @@ namespace FixDates.Actions
 
             var walker = new FlatPhotoDirListWalker(sourcePath);
             walker.UnrecognizedFormat += 
-                file => throw new InvalidOperationException($"Unrecognized {file}");
+                file => throw new InvalidOperationException($"Unrecognized format: {file}");
 			var fileWithIncorrectLocationCount = 0;
             walker.NonMatchingDateStamp += (file, dirDate) => {
                 var dirName = Path.GetFileName(Path.GetDirectoryName(file));

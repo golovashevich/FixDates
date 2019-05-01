@@ -9,7 +9,9 @@ namespace FixDates.Actions
 
         public static void Process(string sourceKey, string quarantineKey)
         {
-            var sourcePath = Environment.GetEnvironmentVariable(sourceKey);
+			Console.WriteLine("Detecting files that are in wrong photo dirs and moving them to quarantine");
+
+			var sourcePath = Environment.GetEnvironmentVariable(sourceKey);
             if (String.IsNullOrWhiteSpace(sourcePath))
             {
                 Console.WriteLine($"Environment variable {sourceKey} is not set");

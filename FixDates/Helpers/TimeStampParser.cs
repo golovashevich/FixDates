@@ -8,7 +8,7 @@ namespace FixDates.Helpers
     public class TimeStampParser
     {
         public const string TIMESTAMP_MASK = 
-            @"(?<y>[1-2]\d{3})-?(?<month>[0-1]\d)-?(?<d>[0-3]\d)[_|-](?<h>[0-2]\d)-?(?<m>[0-5]\d)-?(?<s>[0-5]\d)";
+            @"(?<y>[1-2]\d{3})-?(?<month>[0-1]\d)-?(?<d>[0-3]\d)[_|-]?(?<h>[0-2]\d)-?(?<m>[0-5]\d)-?(?<s>[0-5]\d)";
 
         public const string GUID_MASK = 
             @"[0-9a-fA-F]{{8}}-[0-9a-fA-F]{{4}}-[0-9a-fA-F]{{4}}-[0-9a-fA-F]{{4}}-[0-9a-fA-F]{{12}}";
@@ -19,13 +19,14 @@ namespace FixDates.Helpers
 
         public event Action<string> UnrecognizedStamp;
 
-        public event Action<string> IgnoredName; 
+        public event Action<string> IgnoredName;
 
         private static string[] MASKS = {
             "VID_{0}.mp4", 
             "{0}.mp4", 
             "IMG_{0}.jpg",
-            @"IMG_\d\d\d\d_{0}\d{{3}}.MOV",
+			@"^{0}\.jpg$",
+			@"IMG_\d\d\d\d_{0}\d{{3}}.MOV",
             "PANO_{0}.jpg",
             @"PH{0}-\d{{3}}.JPG",
             "VID_{0}.3gp", 
@@ -33,17 +34,22 @@ namespace FixDates.Helpers
             @"IMG_{0}_\d.jpg",
             @"IMG_{0}_\d{{3}}.jpg",
             @"IMG_{0}_BURST\d.jpg",
-            @"\d{{10}}_{0}\d{{3}}.mp4",
+			@"^IMG_{0}_HHT\.jpg$",
+			@"\d{{10}}_{0}\d{{3}}.mp4",
             String.Format(@"{0}_{{0}}\d{{{{3}}}}.mp4", GUID_MASK),
             @"Screenshot_{0}-\d{{3}}_.*.png",
         };
-
+    
         private static string[] IGNORED_MASKS = {
-            @"IMG_\d\d\d\d\.JPG",
-			@"MVI_\d\d\d\d\.AVI",
-			@"MVI_\d\d\d\d\.THM",
-            @"Thumbs\.db",
-			@"\.DS_Store",
+			@"^Skype_Picture\.jpeg",
+			@"^Skype_Picture_\d\.jpeg",
+            @"^IMG_\d{4}\.JPG",
+			@"^Фото\d{4}\.JPG$",
+			@"^STA_\d\d\d\d\.JPG",
+			@"^MVI_\d\d\d\d\.AVI",
+			@"^MVI_\d\d\d\d\.THM",
+            @"^Thumbs\.db",
+			@"^\.DS_Store",
 			@"^\d\.JPG", 
             @"^\d\d\.JPG"
         };

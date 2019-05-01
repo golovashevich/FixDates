@@ -9,6 +9,7 @@ namespace FixDates.Actions
     {
          public static void Perform(string sourceKey)
         {
+            Console.WriteLine("Making file timestamps correspond to stamps in their names");
             var sourcePath = Environment.GetEnvironmentVariable(sourceKey);
             if (String.IsNullOrWhiteSpace(sourcePath))
             {
