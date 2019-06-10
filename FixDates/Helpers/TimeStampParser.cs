@@ -8,7 +8,7 @@ namespace FixDates.Helpers
     public class TimeStampParser
     {
         public const string TIMESTAMP_MASK = 
-            @"(?<y>[1-2]\d{3})-?(?<month>[0-1]\d)-?(?<d>[0-3]\d)[_|-]?(?<h>[0-2]\d)-?(?<m>[0-5]\d)-?(?<s>[0-5]\d)";
+            @"(?<y>[1-2]\d{3})-?(?<month>[0-1]\d)-?(?<d>[0-3]\d)[ _-]?(?<h>[0-2]\d)[\.|-]?(?<m>[0-5]\d)[\.|-]?(?<s>[0-5]\d)";
 
         public const string GUID_MASK = 
             @"[0-9a-fA-F]{{8}}-[0-9a-fA-F]{{4}}-[0-9a-fA-F]{{4}}-[0-9a-fA-F]{{4}}-[0-9a-fA-F]{{12}}";
@@ -20,12 +20,13 @@ namespace FixDates.Helpers
         public event Action<string> UnrecognizedStamp;
 
         public event Action<string> IgnoredName;
-
-        private static string[] MASKS = {
-            "VID_{0}.mp4", 
-            "{0}.mp4", 
-            "IMG_{0}.jpg",
-			@"^{0}\.jpg$",
+		private static string[] MASKS = {
+            "VID_{0}.mp4",
+			@"video\-{0}\.mp4",
+			"{0}.mp4", 
+            @"{0}(_\d+)?\.jpg$",
+            "^IMG_{0}( - Copy)?.jpg$",
+			@"^{0}(_1)?\.jpg$",
 			@"IMG_\d\d\d\d_{0}\d{{3}}.MOV",
             "PANO_{0}.jpg",
             @"PH{0}-\d{{3}}.JPG",
@@ -33,7 +34,7 @@ namespace FixDates.Helpers
             "IMG_{0}_HDR.jpg",
             @"IMG_{0}_\d.jpg",
             @"IMG_{0}_\d{{3}}.jpg",
-            @"IMG_{0}_BURST\d.jpg",
+            @"^IMG_{0}_BURST\d\d?\.jpg$",
 			@"^IMG_{0}_HHT\.jpg$",
 			@"\d{{10}}_{0}\d{{3}}.mp4",
             String.Format(@"{0}_{{0}}\d{{{{3}}}}.mp4", GUID_MASK),
@@ -41,9 +42,11 @@ namespace FixDates.Helpers
         };
     
         private static string[] IGNORED_MASKS = {
+			@"^Video\d{4}\.mp4$",
+            @"^Photo\d{4}\.jpg$",
 			@"^Skype_Picture\.jpeg",
 			@"^Skype_Picture_\d\.jpeg",
-            @"^IMG_\d{4}\.JPG",
+            @"^IMG_\d{4}\.[JPG|CR2]",
 			@"^Фото\d{4}\.JPG$",
 			@"^STA_\d\d\d\d\.JPG",
 			@"^MVI_\d\d\d\d\.AVI",
@@ -51,8 +54,11 @@ namespace FixDates.Helpers
             @"^Thumbs\.db",
 			@"^\.DS_Store",
 			@"^\d\.JPG", 
-            @"^\d\d\.JPG"
-        };
+            @"^\d\d\.JPG$",
+            @"^M\d{4}\.ctg$",
+            @"^[a-zа-я]+\.jpg$",
+			@"^[\p{IsCyrillic} a-z ̈]+\.ogg$"
+		};
 
         private readonly List<Tuple<string, Regex>> _sequences;
         private readonly List<Tuple<string, Regex>> _ignoredSequences; 
