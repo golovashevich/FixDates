@@ -22,6 +22,7 @@ namespace FixDates.Helpers
         public event Action<string> IgnoredName;
 		private static string[] MASKS = {
             "VID_{0}.mp4",
+			@"VID_{0}\(\d\).mp4",
 			@"video\-{0}\.mp4",
 			"{0}.mp4", 
             @"{0}(_\d+)?\.jpg$",
