@@ -40,6 +40,7 @@ namespace FixDates.Helpers
 			@"\d{{10}}_{0}\d{{3}}.mp4",
             String.Format(@"{0}_{{0}}\d{{{{3}}}}.mp4", GUID_MASK),
             @"Screenshot_{0}-\d{{3}}_.*.png",
+			@"SAVE_{0}.png",
         };
     
         private static string[] IGNORED_MASKS = {
