@@ -5,23 +5,26 @@ using System.Text.RegularExpressions;
 
 namespace FixDates.Helpers
 {
-    public class TimeStampParser
-    {
-        public const string TIMESTAMP_MASK = 
-            @"(?<y>[1-2]\d{3})-?(?<month>[0-1]\d)-?(?<d>[0-3]\d)[ _-]?(?<h>[0-2]\d)[\.|-]?(?<m>[0-5]\d)[\.|-]?(?<s>[0-5]\d)";
+	public class TimeStampParser
+	{
+		public const string TIMESTAMP_MASK =
+			@"(?<y>[1-2]\d{3})-?(?<month>[0-1]\d)-?(?<d>[0-3]\d)[ _-]?(?<h>[0-2]\d)[\.|-]?(?<m>[0-5]\d)[\.|-]?(?<s>[0-5]\d)";
 
-        public const string GUID_MASK = 
-            @"[0-9a-fA-F]{{8}}-[0-9a-fA-F]{{4}}-[0-9a-fA-F]{{4}}-[0-9a-fA-F]{{4}}-[0-9a-fA-F]{{12}}";
+		public const string GUID_MASK =
+			@"[0-9a-fA-F]{{8}}-[0-9a-fA-F]{{4}}-[0-9a-fA-F]{{4}}-[0-9a-fA-F]{{4}}-[0-9a-fA-F]{{12}}";
 
-        public const string TIMESTAMP_FORMAT = "{0}{1:d2}{2:d2}_{3:d2}{4:d2}{5:d2}"; 
+		public const string TIMESTAMP_FORMAT = "{0}{1:d2}{2:d2}_{3:d2}{4:d2}{5:d2}";
 
-        public event Action<string, DateTime> RecognizedStamp;
+		public event Action<string, DateTime> RecognizedStamp;
 
-        public event Action<string> UnrecognizedStamp;
+		public event Action<string> UnrecognizedStamp;
 
-        public event Action<string> IgnoredName;
+		public event Action<string> IgnoredName;
+		
+		// {0} will be replaced by TIMESTAMP_MASK (19800101_212223)
 		private static string[] MASKS = {
             "VID_{0}.mp4",
+			"VID_{0}-thumbnail.jpg",
 			@"VID_{0}\(\d\).mp4",
 			@"video\-{0}\.mp4",
 			"{0}.mp4", 
@@ -37,6 +40,7 @@ namespace FixDates.Helpers
             @"IMG_{0}_\d{{3}}.jpg",
             @"^IMG_{0}_BURST\d\d?\.jpg$",
 			@"^IMG_{0}_HHT\.jpg$",
+			@"^IMG_{0}_crop\.jpg$",
 			@"\d{{10}}_{0}\d{{3}}.mp4",
             String.Format(@"{0}_{{0}}\d{{{{3}}}}.mp4", GUID_MASK),
             @"Screenshot_{0}-\d{{3}}_.*.png",
