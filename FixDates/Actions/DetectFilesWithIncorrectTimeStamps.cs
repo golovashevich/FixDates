@@ -8,7 +8,6 @@ namespace FixDates.Actions
     public class DetectFilesWithIncorrectTimeStamps
     {
         private readonly TimeStampParser _parser = new TimeStampParser();
-        private int _fileWithIncorrectTimeCount = 0;
 
         public DetectFilesWithIncorrectTimeStamps() {
 

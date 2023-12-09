@@ -24,6 +24,7 @@ namespace FixDates.Helpers
 		// {0} will be replaced by TIMESTAMP_MASK (19800101_212223)
 		private static string[] MASKS = {
             "VID_{0}.mp4",
+            @"VID_{0}_\d\.mp4",
 			"VID_{0}-thumbnail.jpg",
 			@"VID_{0}\(\d\).mp4",
 			@"video\-{0}\.mp4",
